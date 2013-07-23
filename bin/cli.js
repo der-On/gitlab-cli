@@ -11,7 +11,7 @@ var usage = fs.readFileSync( __dirname + '/../lib/usage.txt', { encoding: 'utf8'
 optimist.usage(usage);
 
 // help wanted or missing arguments, exit
-if (argv['help'] || argv._.length < 2) {
+if (argv['help'] || argv._.length < 1) {
   console.log(usage);
   process.exit(1);
 }
@@ -29,8 +29,10 @@ var client = gitlab.create({
 client.username = config.username;
 
 // get action and resource
-var action = argv._[0].trim();
-var resource = argv._[1].trim();
+var action = argv._[0] || '';
+action.trim();
+var resource = argv._[1] || '';
+resource.trim();
 
 // resolve aliases
 for(var alias in aliases) {
@@ -54,12 +56,14 @@ if (typeof actions[action] !== 'function') {
   process.exit(1);
 }
 
-resource.forEach(function(part, i) {
-  if (part.trim() === '') {
-    console.error('invalid resource path');
-    process.exit(1);
-  }
-});
+if (resource.length > 1) {
+  resource.forEach(function(part, i) {
+    if (part.trim() === '') {
+      console.error('invalid resource path');
+      process.exit(1);
+    }
+  });
+}
 
 // normalize resource
 resource = {

@@ -18,6 +18,7 @@ Actions:
   comment                 Comments an issue
   alias RESOURCE ALIAS    Create a resource alias to prevent retyping long resource paths
   rm-alias ALIAS          Removes an existing alias
+  list-aliases            Lists all aliases
 
 Options:
   -m 'MESSAGE'            Adds a message (first line will be treated as title other lines as body)
