@@ -119,17 +119,26 @@ if (data.username === null || data.username === 'me') {
 }
 
 // init actions
-actions.init(client, argv, function(error) {
+actions.init({
+  client: client,
+  argv: argv,
+  resource: resource,
+  data: data }, onInit);
+
+function onInit(error) {
   if (error) {
     console.error(error);
   }
   else {
-
-
     // everything seems to be ok, so let's rock!
-    actions[action](resource, data, function(error, data) {
+    actions[action](function(error, data) {
       if (error) {
-        console.error(error);
+        if (typeof error === 'object') {
+          console.error('error: ' + error.data.resBody.message || '');
+        }
+        else {
+          console.error('error: ' + error);
+        }
       }
       else {
         if (data) {
@@ -139,4 +148,4 @@ actions.init(client, argv, function(error) {
       }
     });
   }
-});
+}

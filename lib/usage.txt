@@ -1,4 +1,4 @@
-Usage: gitlab Action Resource [Options]
+Usage: gitlab Action [Resource] [Options]
 
 Resource:
   Is the relative url to the ressource.
@@ -8,14 +8,14 @@ Resource:
     foo/bar/issue/12 for issue with id 12 in namespace 'foo' and the project 'bar'
 
 Actions:
-  get                     Gets resource
-  list                    Lists resource
-  create                  Creates resource
-  remove                  Deletes resource
-  update                  Updates existing resource
-  close                   Closes an issue
-  open                    Opens an issue
-  comment                 Comments an issue
+  get RESOURCE            Gets resource
+  list RESOURCE           Lists resource
+  create RESOURCE         Creates resource
+  remove RESOURCE         Deletes resource
+  update RESOURCE         Updates existing resource
+  close RESOURCE          Closes an issue
+  open RESOURCE           Opens an issue
+  comment RESOURCE        Comments an issue
   alias RESOURCE ALIAS    Create a resource alias to prevent retyping long resource paths
   rm-alias ALIAS          Removes an existing alias
   list-aliases            Lists all aliases
@@ -23,5 +23,5 @@ Actions:
 Options:
   -m 'MESSAGE'            Adds a message (first line will be treated as title other lines as body)
   -u --user USERNAME      User to assign the issue to
-  -l --labels tag1,tag2   Comma seperated list of labels
+  -l --labels tag1,tag2   Comma separated list of labels
   --env ENVIRONMENT       Environment to use under /config/. If not set will use the 'default' environment.
