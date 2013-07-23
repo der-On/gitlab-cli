@@ -2,7 +2,7 @@
 
 var optimist = require('optimist');
 var gitlab = require('node-gitlab');
-var actions = require('../lib/actions');
+var actions = require('../lib/actions') || {};
 
 var argv = optimist.argv;
 var fs = require('fs');
@@ -19,6 +19,7 @@ if (argv['help'] || argv._.length < 2) {
 // load environment
 var env = argv.env || 'default';
 var config = require('../config/' + env);
+var aliases = require('../config/aliases');
 
 // create gitlab client
 var client = gitlab.create({
@@ -28,10 +29,20 @@ var client = gitlab.create({
 client.username = config.username;
 
 // get action and resource
-var action = argv._[0];
-var resource = argv._[1].split('/', 4);
+var action = argv._[0].trim();
+var resource = argv._[1].trim();
 
-// missing actino
+// resolve aliases
+for(var alias in aliases) {
+  if (resource.indexOf(alias + '/') === 0) {
+    resource = resource.replace(alias, aliases[alias]);
+    continue;
+  }
+}
+
+resource = resource.split('/', 4);
+
+// missing action
 if (action.trim() === '') {
   console.error('no action specified');
   process.exit(1);
@@ -104,42 +115,23 @@ if (data.username === null || data.username === 'me') {
 }
 
 // init actions
-actions.init(client, function(error) {
+actions.init(client, argv, function(error) {
   if (error) {
     console.error(error);
   }
   else {
-    function getActionVerb(action)
-    {
-      var verb = action;
-      var lastChar = action.substr(-1, 1);
 
-      if (lastChar === 'e') {
-        verb = action.substr(0, action.length - 1);
-      }
-      else if (action === 'get') {
-        verb = action + 't';
-      }
-
-      verb += 'ing';
-
-      return verb;
-    }
 
     // everything seems to be ok, so let's rock!
     actions[action](resource, data, function(error, data) {
-      if (resource.project) {
-        console.log(getActionVerb(action) + ' ' + resource.type + ' in project "' + resource.project + '" ...');
-      }
-      else {
-        console.log(getActionVerb(action) + ' all ' + resource.type + ' ...');
-      }
-
       if (error) {
         console.error(error);
       }
       else {
-        console.log(data);
+        if (data) {
+          console.log(data);
+        }
+        console.log('done');
       }
     });
   }

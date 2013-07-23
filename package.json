@@ -2,7 +2,7 @@
   "name": "gitlab-cli",
   "version": "0.0.1",
   "description": "Gitlab API on the command line",
-  "main": "bin/gitlab-cli.js",
+  "main": "bin/cli.js",
   "bin": {
     "gitlab-cli": "gitlab-cli.js"
   },
