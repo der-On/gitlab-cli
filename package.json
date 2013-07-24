@@ -11,7 +11,7 @@
   },
   "author": "Ondrej Brinkel",
   "license": "BSD",
-  "dependecies": {
+  "dependencies": {
     "node-gitlab": ">=0.0.5",
     "optimist": ">=0.6.0"
   }
