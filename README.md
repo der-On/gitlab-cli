@@ -6,7 +6,7 @@ This node.js application provides a command line interface to the GitLab API v3.
 Usage: gitlab Action [Resource] [Options]
 
 Resource:
-  Is the relative url to the ressource.
+  Is the relative url to the resource.
 
   Examples:
     foo/bar/issue for issues in the namespace 'foo' and the project 'bar'
