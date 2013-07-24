@@ -21,6 +21,9 @@ To get a list of available commands
 
     gitlab --help
 
+
+## Help
+
     Resource:
       Is the relative url to the resource.
 
