@@ -22,7 +22,9 @@ To get a list of available commands
     gitlab --help
 
 
-## Help
+### Help
+
+    gitlab Action [Resource] [Options]
 
     Resource:
       Is the relative url to the resource.
