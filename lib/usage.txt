@@ -24,4 +24,6 @@ Options:
   -m 'MESSAGE'            Adds a message (first line will be treated as title other lines as body)
   -u --user USERNAME      User to assign the issue to
   -l --labels tag1,tag2   Comma separated list of labels
+  -f --filter attr=value  Filter results by value of a property
+  --json                  Output all data as JSON
   --env ENVIRONMENT       Environment to use under /config/. If not set will use the 'default' environment.

@@ -3,6 +3,7 @@
 var optimist = require('optimist');
 var gitlab = require('node-gitlab');
 var actions = require('../lib/actions') || {};
+var stringify = require('../lib/stringify');
 
 var argv = optimist.argv;
 var fs = require('fs');
@@ -76,46 +77,74 @@ resource = {
 };
 
 // normalize data
-var data = {
+var options = {
   title: null,
   description: null,
   labels: [],
-  username: null
+  username: null,
+  filter: null,
+  json: false
 };
 
 // parse message
 if (argv['m']) {
   var message = argv.m.split("\n",2);
   if (message.length >= 1) {
-    data.title = message[0].trim();
+    options.title = message[0].trim();
   }
   if (message.length === 2) {
-    data.description = message[1].trim();
+    options.description = message[1].trim();
   }
 }
 
 // parse labels
 if (argv['l'] && argv.t.trim() !== '') {
-  data.labels = argv.l.trim().split(',');
+  options.labels = argv.l.trim().split(',');
 }
 else if (argv['labels'] && argv.tags.trim() !== '') {
-  data.labels = argv.labels.trim().split(',');
+  options.labels = argv.labels.trim().split(',');
 }
 
-data.labels.forEach(function(label, i) {
-  data.labels[i] = label.trim();
+options.labels.forEach(function(label, i) {
+  options.labels[i] = label.trim();
 });
 
 // parse user
 if (argv['u'] && argv.u.trim() !== '') {
-  data.username = argv.u.trim();
+  options.username = argv.u.trim();
 }
 else if(argv['user'] && argv.user.trim() !== '') {
-  data.username = argv.user.trim();
+  options.username = argv.user.trim();
 }
 
-if (data.username === null || data.username === 'me') {
-  data.username = config.username;
+if (options.username === null || options.username === 'me') {
+  options.username = config.username;
+}
+
+// parse filters
+if (argv['f'] && argv.f.trim() !== '') {
+  options.filter = argv.f.trim();
+}
+if (argv['filter'] && argv.filter.trim() !== '') {
+  options.filter = argv.filter.trim();
+}
+
+if (options.filter) {
+  options.filter = options.filter.split('=', 2);
+
+  if (options.filter.length < 2) {
+    console.error('missing value in filter');
+    process.exit(1);
+  }
+
+  options.filter = {
+    attr: options.filter[0],
+    value: options.filter[1]
+  };
+}
+
+if (argv['json']) {
+  options.json = true;
 }
 
 // init actions
@@ -123,7 +152,22 @@ actions.init({
   client: client,
   argv: argv,
   resource: resource,
-  data: data }, onInit);
+  options: options }, onInit);
+
+function inFilter(item)
+{
+  if (options.filter) {
+    if (item[options.filter.attr]) {
+      if (item[options.filter.attr.toString()] == options.filter.value) {
+        return true;
+      }
+    }
+    return false;
+  }
+  else {
+    return true;
+  }
+}
 
 function onInit(error) {
   if (error) {
@@ -142,7 +186,32 @@ function onInit(error) {
       }
       else {
         if (data) {
-          console.log(data);
+          if (typeof data === 'object') {
+            if (typeof data.length === 'number') {
+              data.forEach(function(item, i) {
+                if (inFilter(item)) {
+                  if (options.json === false && stringify[resource.type]) {
+                    console.log(stringify[resource.type](item));
+                  }
+                  else {
+                    console.log(item);
+                  }
+                  console.log("-------------------------------------");
+                }
+              });
+            }
+            else if (inFilter(data)) {
+              if (options.json === false && stringify[resource.type]) {
+                console.log(stringify[resource.type](data));
+              }
+              else {
+                console.log(data);
+              }
+            }
+          }
+          else {
+            console.log(data);
+          }
         }
         console.log('done');
       }
