@@ -12,7 +12,7 @@ var usage = fs.readFileSync( __dirname + '/../lib/usage.txt', { encoding: 'utf8'
 optimist.usage(usage);
 
 // help wanted or missing arguments, exit
-if (argv['help'] || argv._.length < 1) {
+if (argv['h'] || argv['help'] || argv._.length < 1) {
   console.log(usage);
   process.exit(1);
 }
@@ -98,10 +98,10 @@ if (argv['m']) {
 }
 
 // parse labels
-if (argv['l'] && argv.t.trim() !== '') {
+if (argv['l'] && argv.l.trim() !== '') {
   options.labels = argv.l.trim().split(',');
 }
-else if (argv['labels'] && argv.tags.trim() !== '') {
+else if (argv['labels'] && argv.labels.trim() !== '') {
   options.labels = argv.labels.trim().split(',');
 }
 
@@ -169,6 +169,36 @@ function inFilter(item)
   }
 }
 
+function hasLabels(item)
+{
+  if (options.labels && options.labels.length > 0) {
+    if (item.labels) {
+      for(var i = 0; i < options.labels.length; i++) {
+        if (hasLabel(item, options.labels[i])) {
+          return true;
+        }
+      }
+      return false;
+    }
+    else {
+      return false;
+    }
+  }
+  else {
+    return true;
+  }
+}
+
+function hasLabel(item, label)
+{
+  for(var i = 0; i < item.labels.length; i++) {
+    if (item.labels[i] === label) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function onInit(error) {
   if (error) {
     console.error(error);
@@ -189,7 +219,7 @@ function onInit(error) {
           if (typeof data === 'object') {
             if (typeof data.length === 'number') {
               data.forEach(function(item, i) {
-                if (inFilter(item)) {
+                if (inFilter(item) && hasLabels(item)) {
                   if (options.json === false && stringify[resource.type]) {
                     console.log(stringify[resource.type](item));
                   }
@@ -200,7 +230,7 @@ function onInit(error) {
                 }
               });
             }
-            else if (inFilter(data)) {
+            else if (inFilter(data) && hasLabels(item)) {
               if (options.json === false && stringify[resource.type]) {
                 console.log(stringify[resource.type](data));
               }

@@ -21,8 +21,9 @@ Actions:
   list-aliases            Lists all aliases
 
 Options:
+  -h --help               Display this help
   -m 'MESSAGE'            Adds a message (first line will be treated as title other lines as body)
-  -u --user USERNAME      User to assign the issue to
+  -u --user USERNAME      User to assign the issue to, default is "me" (use "me" to assign to user defined in environment)
   -l --labels tag1,tag2   Comma separated list of labels
   -f --filter attr=value  Filter results by value of a property
   --json                  Output all data as JSON
