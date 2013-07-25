@@ -238,7 +238,7 @@ function onInit(error) {
                 }
               });
             }
-            else if (inFilter(data) && hasLabels(item)) {
+            else if (inFilter(data) && hasLabels(data)) {
               if (options.json === false && stringify[resource.type]) {
                 console.log(stringify[resource.type](data));
               }
