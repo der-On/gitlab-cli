@@ -155,9 +155,6 @@ function onInit(error) {
   else {
     // everything seems to be ok, so let's rock!
     actions[action](function(error, data) {
-      console.log('[DEBUG] performed action');
-      console.log(deps);
-
       if (error) {
         if (typeof error === 'object') {
           console.error('error: ' + error.data.resBody.message || '');
