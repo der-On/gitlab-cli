@@ -2,11 +2,15 @@
   "name": "gitlab-cli",
   "version": "0.0.1",
   "description": "Gitlab API on the command line",
-  "main": "bin/cli.js",
+  "main": "./bin/cli.js",
+  "bin": {
+    "gitlab": "./bin/cli.js"
+  },
   "author": {
     "name": "Ondrej Brinkel",
     "email": "info@anzui.de"
   },
+  "preferGlobal": true,
   "homepage": "https://github.com/der-On/gitlab-cli",
   "license": "BSD",
   "repository": {
@@ -21,5 +25,8 @@
   "dependencies": {
     "node-gitlab": ">=0.0.6",
     "optimist": ">=0.6.0"
+  },
+  "engines": {
+    "node": "*"
   }
 }

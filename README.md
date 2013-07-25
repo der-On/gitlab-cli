@@ -4,14 +4,9 @@ This node.js application provides a command line interface to the GitLab API v3.
 
 ## Installation
 
-Install dependencies using npm:
+Install it using npm:
 
-    npm install
-
-Create a symlink to the bin/cli.js in your bin/ folder(s)
-
-    ln -s bin/cli.js ~/bin/gitlab
-
+    npm install gitlab-cli -g
 
 ## Usage
 
