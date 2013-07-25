@@ -4,9 +4,15 @@ var optimist = require('optimist');
 var gitlab = require('node-gitlab');
 var actions = require('../lib/actions') || {};
 var stringify = require('../lib/stringify');
+var defaults = require('../lib/defaults');
+var optionsParser = require('../lib/parser/optionsParser');
+var dataParser = require('../lib/parser/dataParser');
+var resourceParser = require('../lib/parser/resourceParser');
 
 var argv = optimist.argv;
 var fs = require('fs');
+
+var deps = {}; // dependencies passed around
 
 var usage = fs.readFileSync( __dirname + '/../usage.txt', { encoding: 'utf8' });
 optimist.usage(usage);
@@ -30,31 +36,12 @@ catch (error) {
 }
 
 
-// create gitlab client
-var client = gitlab.create({
-  api: config.url + '/api/v3',
-  privateToken: config.privateToken
-});
-client.username = config.username;
-
-// get action and resource
+// get action
 var action = argv._[0] || '';
-action.trim();
-var resource = argv._[1] || '';
-resource.trim();
-
-// resolve aliases
-for(var alias in aliases) {
-  if (resource.indexOf(alias + '/') === 0) {
-    resource = resource.replace(alias, aliases[alias]);
-    continue;
-  }
-}
-
-resource = resource.split('/', 4);
+action = action.trim();
 
 // missing action
-if (action.trim() === '') {
+if (action === '') {
   console.error('no action specified');
   process.exit(1);
 }
@@ -65,111 +52,62 @@ if (typeof actions[action] !== 'function') {
   process.exit(1);
 }
 
-if (resource.length > 1) {
-  resource.forEach(function(part, i) {
-    if (part.trim() === '') {
-      console.error('invalid resource path');
-      process.exit(1);
-    }
-  });
+// get resource
+deps.resource = resourceParser(argv, aliases);
+
+// get data
+deps.data = dataParser(argv);
+
+// get options
+deps.options = optionsParser(argv);
+
+// resolve "me" in username
+if (deps.options.username === "me") {
+  deps.options.username = config.username;
 }
 
-// normalize resource
-resource = {
-  namespace: (resource.length >= 2) ? resource[0] : null,
-  project: (resource.length >= 3) ? resource[1] : null,
-  type: (resource.length >= 3) ?
-          (resource[2].substr(-1,1) == 's') ? resource[2] : resource[2] + 's'
-          : (resource.length === 1) ? resource[0] : resource[1],
-  id: resource[3] || null
-};
+// copy labels from data to options
+deps.options.labels = deps.data.labels;
 
-// normalize data
-var options = {
-  title: null,
-  description: null,
-  labels: [],
-  username: null,
-  filter: null,
-  json: false
-};
-
-// parse message
-if (argv['m']) {
-  var message = argv.m.split("\n",2);
-  if (message.length >= 1) {
-    options.title = message[0].trim();
-  }
-  if (message.length === 2) {
-    options.description = message[1].trim();
-  }
+// copy prefixed id from resource to data
+if (deps.resource.id && !deps.data.id) {
+  deps.data[deps.resource.type.substr(0, deps.resource.type.length - 1) + '_id'] = deps.resource.id;
 }
 
-// parse labels
-if (argv['l'] && argv.l.trim() !== '') {
-  options.labels = argv.l.trim().split(',');
-}
-else if (argv['labels'] && argv.labels.trim() !== '') {
-  options.labels = argv.labels.trim().split(',');
+if (deps.options.debug) {
+  console.log('[DEBUG] initalized gitlab-cli');
+  console.log(deps);
 }
 
-options.labels.forEach(function(label, i) {
-  options.labels[i] = label.trim();
+// create gitlab client
+var client = gitlab.create({
+  api: config.url + '/api/v3',
+  privateToken: config.privateToken
 });
-
-// parse user
-if (argv['u'] && argv.u.trim() !== '') {
-  options.username = argv.u.trim();
-}
-else if(argv['user'] && argv.user.trim() !== '') {
-  options.username = argv.user.trim();
-}
-
-if (options.username === null || options.username === 'me') {
-  options.username = config.username;
-}
-
-// parse filters
-if (argv['f'] && argv.f.trim() !== '') {
-  options.filter = argv.f.trim();
-}
-if (argv['filter'] && argv.filter.trim() !== '') {
-  options.filter = argv.filter.trim();
-}
-
-if (options.filter) {
-  options.filter = options.filter.split('=', 2);
-
-  if (options.filter.length < 2) {
-    console.error('missing value in filter');
-    process.exit(1);
-  }
-
-  options.filter = {
-    attr: options.filter[0],
-    value: options.filter[1]
-  };
-}
-
-if (argv['json']) {
-  options.json = true;
-}
+client.username = config.username;
 
 // init actions
 actions.init({
   client: client,
   argv: argv,
-  resource: resource,
-  options: options }, onInit);
+  resource: deps.resource,
+  data: deps.data,
+  options: deps.options }, onInit);
 
-function inFilter(item)
+function inFilters(item)
 {
-  if (options.filter) {
-    if (item[options.filter.attr]) {
-      if (item[options.filter.attr.toString()] == options.filter.value) {
-        return true;
+  var i, key, filter;
+
+  if (deps.options.filters) {
+
+    for(key in deps.options.filters) {
+      if (item[key]) {
+        if (item[key] == deps.options.filters[key]) {
+          return true;
+        }
       }
     }
+
     return false;
   }
   else {
@@ -179,10 +117,13 @@ function inFilter(item)
 
 function hasLabels(item)
 {
-  if (options.labels && options.labels.length > 0) {
+  var i, label;
+  if (deps.options.labels && deps.options.labels.length > 0) {
     if (item.labels) {
-      for(var i = 0; i < options.labels.length; i++) {
-        if (hasLabel(item, options.labels[i])) {
+      for(i = 0; i < deps.options.labels.length; i++) {
+        label = deps.options.labels[i];
+
+        if (hasLabel(item, label)) {
           return true;
         }
       }
@@ -214,6 +155,9 @@ function onInit(error) {
   else {
     // everything seems to be ok, so let's rock!
     actions[action](function(error, data) {
+      console.log('[DEBUG] performed action');
+      console.log(deps);
+
       if (error) {
         if (typeof error === 'object') {
           console.error('error: ' + error.data.resBody.message || '');
@@ -227,9 +171,9 @@ function onInit(error) {
           if (typeof data === 'object') {
             if (typeof data.length === 'number') {
               data.forEach(function(item, i) {
-                if (inFilter(item) && hasLabels(item)) {
-                  if (options.json === false && stringify[resource.type]) {
-                    console.log(stringify[resource.type](item));
+                if (inFilters(item) && hasLabels(item)) {
+                  if (deps.options.json === false && stringify[deps.resource.type]) {
+                    console.log(stringify[deps.resource.type](item));
                   }
                   else {
                     console.log(item);
@@ -238,9 +182,9 @@ function onInit(error) {
                 }
               });
             }
-            else if (inFilter(data) && hasLabels(data)) {
-              if (options.json === false && stringify[resource.type]) {
-                console.log(stringify[resource.type](data));
+            else if (inFilters(data) && hasLabels(data)) {
+              if (deps.options.json === false && stringify[deps.resource.type]) {
+                console.log(stringify[deps.resource.type](data));
               }
               else {
                 console.log(data);
