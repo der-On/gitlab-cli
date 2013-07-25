@@ -6,7 +6,7 @@
   "author": "Ondrej Brinkel",
   "license": "BSD",
   "dependencies": {
-    "node-gitlab": ">=0.0.5",
+    "node-gitlab": ">=0.0.6",
     "optimist": ">=0.6.0"
   }
 }
