@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "description": "Gitlab API on the command line",
   "main": "bin/cli.js",
-  "author": "Ondrej Brinkel",
+  "author": {
+    "name": "Ondrej Brinkel",
+    "email": "info@anzui.de"
+  },
   "homepage": "https://github.com/der-On/gitlab-cli",
   "license": "BSD",
   "repository": {
