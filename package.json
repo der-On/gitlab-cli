@@ -4,7 +4,17 @@
   "description": "Gitlab API on the command line",
   "main": "bin/cli.js",
   "author": "Ondrej Brinkel",
+  "homepage": "https://github.com/der-On/gitlab-cli",
   "license": "BSD",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/der-On/gitlab-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/der-On/gitlab-cli/issues"
+  },
+  "keywords": ["gitlab", "cli", "command line"],
+  "readmeFilename": "README.md",
   "dependencies": {
     "node-gitlab": ">=0.0.6",
     "optimist": ">=0.6.0"

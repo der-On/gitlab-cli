@@ -8,7 +8,7 @@ var stringify = require('../lib/stringify');
 var argv = optimist.argv;
 var fs = require('fs');
 
-var usage = fs.readFileSync( __dirname + '/../lib/usage.txt', { encoding: 'utf8' });
+var usage = fs.readFileSync( __dirname + '/../usage.txt', { encoding: 'utf8' });
 optimist.usage(usage);
 
 // help wanted or missing arguments, exit
