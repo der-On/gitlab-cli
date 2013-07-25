@@ -20,7 +20,15 @@ if (argv['h'] || argv['help'] || argv._.length < 1) {
 // load environment
 var env = argv.env || 'default';
 var config = require('../config/' + env);
-var aliases = require('../config/aliases');
+
+// aliases file might not exist
+try {
+  var aliases = require('../config/aliases');
+}
+catch (error) {
+  var aliases = {};
+}
+
 
 // create gitlab client
 var client = gitlab.create({
