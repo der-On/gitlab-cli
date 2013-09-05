@@ -1,7 +1,5 @@
-var config = {
-  "url": "URL to your gitlab",
+{
+  "url": "http://gitlab.example.com",
   "username": "your username",
   "privateToken": "Your private token"
 }
-
-module.exports = config;
