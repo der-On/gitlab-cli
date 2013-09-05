@@ -24,7 +24,8 @@
   "readmeFilename": "README.md",
   "dependencies": {
     "node-gitlab": ">=0.0.6",
-    "optimist": ">=0.6.0"
+    "optimist": ">=0.6.0",
+    "configure": "0.0.1"
   },
   "engines": {
     "node": "*"
