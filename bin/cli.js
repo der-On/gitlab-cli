@@ -24,8 +24,7 @@ if (argv['h'] || argv['help'] || argv._.length < 1) {
 }
 
 // load environment
-var env = argv.env || 'default';
-var config = require('../config/' + env);
+var config = require("configure");
 
 // aliases file might not exist
 try {
