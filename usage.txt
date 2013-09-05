@@ -27,7 +27,7 @@ Options:
   -l --labels tag1,tag2         Comma separated list of labels
   -f --filters key=value,...    Filter results by comma separated list of key=value pairs. Results must match these key=value pairs.
   --json                        Output all data as JSON
-  --env ENVIRONMENT             Environment to use under /config/. If not set will use the 'default' environment.
+  --config config.json          JSON configuration file to use. If not set will use the 'config.json' file in the current directory.
   --data key=value,...          Set data by comma separated list of key=value pairs.
   --data-json JSON              Set data using a JSON string. If "data" is also set, it will overwrite existing keys.
   --debug                       If present will display debug information
