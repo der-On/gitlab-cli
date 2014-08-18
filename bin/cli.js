@@ -173,7 +173,7 @@ function onInit(error) {
                     console.log(stringify[deps.resource.type](item));
                   }
                   else {
-                    console.log(item);
+                    console.log(JSON.stringify(item, null, 2));
                   }
                   console.log("-------------------------------------");
                 }
@@ -184,7 +184,7 @@ function onInit(error) {
                 console.log(stringify[deps.resource.type](data));
               }
               else {
-                console.log(data);
+                console.log(JSON.stringify(data, null, 2));
               }
             }
           }
