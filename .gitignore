@@ -1,3 +1,4 @@
 config/*.js
 !config/default.sample.js
 node_modules
+.idea
