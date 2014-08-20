@@ -61,6 +61,11 @@ deps.data = dataParser(argv);
 // get options
 deps.options = optionsParser(argv);
 
+// accept self-signed or unauthorized certificates
+if (deps.options.acceptCerts) {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+}
+
 // resolve "me" in username
 if (deps.options.username === "me") {
   deps.options.username = config.username;
@@ -167,6 +172,8 @@ function onInit(error) {
         if (data) {
           if (typeof data === 'object') {
             if (typeof data.length === 'number') {
+              if (deps.options.json) console.log('[');
+
               data.forEach(function(item, i) {
                 if (inFilters(item) && hasLabels(item)) {
                   if (deps.options.json === false && stringify[deps.resource.type]) {
@@ -175,9 +182,10 @@ function onInit(error) {
                   else {
                     console.log(JSON.stringify(item, null, 2));
                   }
-                  console.log("-------------------------------------");
+                  if (!deps.options.json) console.log("-------------------------------------");
                 }
               });
+              if (deps.options.json) console.log(']');
             }
             else if (inFilters(data) && hasLabels(data)) {
               if (deps.options.json === false && stringify[deps.resource.type]) {
@@ -192,7 +200,7 @@ function onInit(error) {
             console.log(data);
           }
         }
-        console.log('done');
+        if (!deps.options.json) console.log('done');
       }
     });
   }
