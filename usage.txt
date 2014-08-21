@@ -27,8 +27,8 @@ Options:
   -l --labels tag1,tag2         Comma separated list of labels
   -f --filters key=value,...    Filter results by comma separated list of key=value pairs. Results must match these key=value pairs.
   --json                        Output all data as JSON
-  --env ENVIRONMENT             Environment to use under /config/. If not set will use the 'default' environment.
   --data key=value,...          Set data by comma separated list of key=value pairs.
   --data-json JSON              Set data using a JSON string. If "data" is also set, it will overwrite existing keys.
   --accept-certs                If present all SSL certificates (including self-signed) will be accepted
+  --config=path/to/config.js    Set path to configuration file to use. If not set it will look for the file in ~/.config/gitlab-cli/default.js
   --debug                       If present will display debug information

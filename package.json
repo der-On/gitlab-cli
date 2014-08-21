@@ -1,6 +1,6 @@
 {
   "name": "gitlab-cli",
-  "version": "0.0.17",
+  "version": "0.1.0",
   "description": "Gitlab API on the command line",
   "main": "./bin/cli.js",
   "bin": {
@@ -20,9 +20,14 @@
   "bugs": {
     "url": "https://github.com/der-On/gitlab-cli/issues"
   },
-  "keywords": ["gitlab", "cli", "command line"],
+  "keywords": [
+    "gitlab",
+    "cli",
+    "command line"
+  ],
   "readmeFilename": "README.md",
   "dependencies": {
+    "home": "^0.1.3",
     "node-gitlab": ">=0.0.6",
     "optimist": ">=0.6.0"
   },

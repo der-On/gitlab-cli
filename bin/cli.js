@@ -1,21 +1,27 @@
 #!/usr/bin/env node
 
+var path = require('path');
+var fs = require('fs');
+var home = require('home');
 var optimist = require('optimist');
 var gitlab = require('node-gitlab');
 var actions = require('../lib/actions') || {};
 var stringify = require('../lib/stringify');
-var defaults = require('../lib/defaults');
 var optionsParser = require('../lib/parser/optionsParser');
 var dataParser = require('../lib/parser/dataParser');
 var resourceParser = require('../lib/parser/resourceParser');
 
 var argv = optimist.argv;
-var fs = require('fs');
 
 var deps = {}; // dependencies passed around
 
 var usage = fs.readFileSync( __dirname + '/../usage.txt', { encoding: 'utf8' });
 optimist.usage(usage);
+
+if (argv.env) {
+  console.log('The --env option is not used anymore. Please use --config instead.');
+  process.exit(1);
+}
 
 // help wanted or missing arguments, exit
 if (argv['h'] || argv['help'] || argv._.length < 1) {
@@ -24,8 +30,18 @@ if (argv['h'] || argv['help'] || argv._.length < 1) {
 }
 
 // load environment
-var env = argv.env || 'default';
-var config = require('../config/' + env);
+var configPath = (typeof argv.config === 'string') ? argv.config : '~/.config/gitlab-cli/default.js';
+try {
+  var configFullPath = home.resolve(configPath);
+} catch(error) {
+
+}
+
+if (!configFullPath || !fs.existsSync(configFullPath)) {
+  console.log('Configuration file could not be found under: ' + configPath + '\nPlease create it from the example under config/default.sample.js');
+  process.exit(1);
+}
+var config = require(configFullPath);
 
 // aliases file might not exist
 try {
