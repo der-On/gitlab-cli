@@ -172,20 +172,26 @@ function onInit(error) {
         if (data) {
           if (typeof data === 'object') {
             if (typeof data.length === 'number') {
-              if (deps.options.json) console.log('[');
 
-              data.forEach(function(item, i) {
-                if (inFilters(item) && hasLabels(item)) {
-                  if (deps.options.json === false && stringify[deps.resource.type]) {
+              data = data.filter(function(item) {
+                return (inFilters(item) && hasLabels(item));
+              });
+
+              if (deps.options.json) {
+                console.log(JSON.stringify(data, null, 2));
+              }
+              else {
+                data.forEach(function(item, i) {
+
+                  if (stringify[deps.resource.type]) {
                     console.log(stringify[deps.resource.type](item));
                   }
                   else {
                     console.log(JSON.stringify(item, null, 2));
                   }
-                  if (!deps.options.json) console.log("-------------------------------------");
-                }
-              });
-              if (deps.options.json) console.log(']');
+                  console.log("-------------------------------------");
+                });
+              }
             }
             else if (inFilters(data) && hasLabels(data)) {
               if (deps.options.json === false && stringify[deps.resource.type]) {
