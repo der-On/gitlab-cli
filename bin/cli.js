@@ -68,11 +68,11 @@ if (typeof actions[action] !== 'function') {
   process.exit(1);
 }
 
-// get resource
-deps.resource = resourceParser(argv, aliases);
-
 // get data
 deps.data = dataParser(argv);
+
+// get resource
+deps.resource = resourceParser(argv, aliases, deps.data);
 
 // get options
 deps.options = optionsParser(argv);
